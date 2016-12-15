@@ -1,0 +1,27 @@
+{
+  "name": "time-picker",
+  "description": "",
+  "main": "time-picker.html",
+  "authors": [
+    "Glenn Vandeuren <vandeurenglenn@gmail.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "time-picker",
+    "time-selector",
+    "material",
+    "clock",
+    "time"
+  ],
+  "homepage": "",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "web-clock": "vandeurenglenn/web-clock"
+  }
+}
