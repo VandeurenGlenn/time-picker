@@ -22,6 +22,6 @@
     "tests"
   ],
   "dependencies": {
-    "web-clock": "vandeurenglenn/web-clock"
+    "web-clock-lite": "vandeurenglenn/web-clock-lite"
   }
 }

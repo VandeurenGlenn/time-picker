@@ -1,7 +1,8 @@
 'use strict';
 import TimePickerPlate from './time-picker-plate.js';
 import PubSub from './internals/pub-sub.js';
-'@web-clock-lite';
+import WebClockLite from './../bower_components/web-clock-lite/src/web-clock-lite.js';
+
 let pubsub = new PubSub();
 /**
  * @extends HTMLElement
@@ -105,7 +106,7 @@ class TimePicker extends HTMLElement {
 				}
        </style>
        <header>
-         <web-clock-lite picker-clock></web-clock-lite>
+         <web-clock-lite></web-clock-lite>
        </header>
 			 <div class="am-pm">
 			 	 <span class="flex"></span>
@@ -125,7 +126,7 @@ class TimePicker extends HTMLElement {
   }
 
   get digitalClock() {
-    return this.root.querySelector('digital-clock');
+    return this.root.querySelector('web-clock-lite');
   }
 
   get plate() {

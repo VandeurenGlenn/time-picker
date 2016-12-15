@@ -301,13 +301,13 @@ class TimePickerPlate extends HTMLElement {
 }
 customElements.define('time-picker-plate', TimePickerPlate);
 
-class DigitalClock extends HTMLElement {
+class WebClockLite extends HTMLElement {
+  static get observedAttributes() {
+    return ['hour', 'minutes'];
+  }
   constructor() {
     super();
     this.root = this.attachShadow({mode: 'open'});
-    this._onClick = this._onClick.bind(this);
-  }
-  connectedCallback() {
     this.root.innerHTML = `
   <style>
     :host {
@@ -317,10 +317,15 @@ class DigitalClock extends HTMLElement {
       flex-direction: row;
       padding: 8px;
       box-sizing: border-box;
-      color: var(--digital-clock-color, #555);
+      color: var(--web-clock-color, #555);
+      cursor: default;
     }
-    :host([picker][picker-opened]){
-      --digital-clock-color: #FFF;
+    :host([picker]) {
+      cursor: pointer;
+    })
+    :host([picker-opened]) {
+      opacity: 0;
+      pointer-events: none;
     }
     .indicator {
       padding: 0 8px;
@@ -330,26 +335,7 @@ class DigitalClock extends HTMLElement {
   <span class="indicator">:</span>
   <div class="minutes"></div>
     `;
-
-    if (this.hasPicker) {
-      this.picker = this.customPicker || this.defaultPicker;
-      this.addEventListener('click', this._onClick);
-    } else {
-      // this.startClock
-    }
-  }
-
-  get defaultPicker() {
-    // TODO: lazy import
-    return new TimePicker();
-  }
-
-  get customPicker() {
-    return this._customPicker || this.getAttribute('custom-picker');
-  }
-
-  get hasPicker() {
-    return this._hasPicker || this.hasAttribute('picker') || false;
+    this._onClick = this._onClick.bind(this);
   }
 
   get time() {
@@ -357,22 +343,11 @@ class DigitalClock extends HTMLElement {
   }
 
   get hour() {
-    return this._hour || '8';
+    return this._hour;
   }
 
   get minutes() {
-    return this._minutes || '00';
-  }
-
-  set customPicker(value) {
-    this._customPicker = value;
-  }
-
-  /**
-   * Setting to true, displays a time picker on click
-   */
-  set hasPicker(value) {
-    this._hasPicker = value;
+    return this._minutes;
   }
 
   set hour(value) {
@@ -392,17 +367,13 @@ class DigitalClock extends HTMLElement {
     });
   }
 
-  _onClick(event) {
-    event.preventDefault();
-    this.picker.opened = true;
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (oldValue !== newValue) this[name] = newValue;
   }
 }
-customElements.define('digital-clock', DigitalClock);
+customElements.define('web-clock-lite', WebClockLite);
 
-/**
- * @extends HTMLElement
- */
-class TimePicker$1 extends HTMLElement {
+class TimePicker extends HTMLElement {
   /**
    * Attributes to observer
    * @return {Array} []
@@ -501,7 +472,7 @@ class TimePicker$1 extends HTMLElement {
 				}
        </style>
        <header>
-         <web-clock picker-clock></web-clock>
+         <web-clock-lite></web-clock-lite>
        </header>
 			 <div class="am-pm">
 			 	 <span class="flex"></span>
@@ -521,7 +492,7 @@ class TimePicker$1 extends HTMLElement {
   }
 
   get digitalClock() {
-    return this.root.querySelector('digital-clock');
+    return this.root.querySelector('web-clock-lite');
   }
 
   get plate() {
@@ -567,4 +538,4 @@ class TimePicker$1 extends HTMLElement {
     this[prop] = value;
   }
 }
-customElements.define('time-picker', TimePicker$1);
+customElements.define('time-picker', TimePicker);

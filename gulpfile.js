@@ -6,40 +6,6 @@ const {rollup} = require('rollup');
 const babel = require('rollup-plugin-babel');
 let cache;
 
-let inject = (tasks, cb) => {
-  let calls = 0;
-  let need = option => {
-    console.error(`${option}::undefined`);
-  }
-  for (let task of tasks) {
-    let sources = task.sources || task.src || need('sources');
-    calls += 1;
-    for (let source of sources) {
-      let dest = task.dest || source;
-      let file = readFileSync(source).toString();
-      file = file.replace(task.tag, task.inject);
-      writeFileSync(dest, file);
-      if (calls === tasks.length) {
-        cb();
-      }
-    }
-  }
-}
-
-task('copy:scripts', () => {
-  return src(['src/**/*.js', '!src/time-picker.js']).pipe(dest('.tmp'));
-});
-
-task('inject:scripts', cb => {
-  let scripts = [{
-    src: ['src/time-picker.js'],
-    tag: '@web-clock-lite',
-    inject: readFileSync('./bower_components/web-clock/src/web-clock-lite.js'),
-    dest: '.tmp/time-picker.js'
-  }]
-  return inject(scripts, cb);
-});
-
 task('rollup', () => {
   return rollup({
     entry: 'src/time-picker.js',
@@ -73,7 +39,5 @@ task('browser-sync', () => {
   browserSync.watch('demo/*.html').on('change', reload());
 });
 
-task('copy', series('copy:scripts'));
-task('inject', series('inject:scripts'));
-task('build', series('copy', 'inject', 'rollup'));
+task('build', series('rollup'));
 task('serve', series('build', 'browser-sync'));
