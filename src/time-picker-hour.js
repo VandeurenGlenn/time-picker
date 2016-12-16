@@ -108,7 +108,7 @@ export default class TimePickerHour extends HTMLElement {
     event.preventDefault();
     event.stopPropagation();
     this.dispatchEvent(new CustomEvent('hour-select', {
-      detail: this._container.innerHTML
+      detail: this.hour
     }));
   }
 
@@ -116,7 +116,7 @@ export default class TimePickerHour extends HTMLElement {
     this.dispatchEvent(new CustomEvent('hour-indicating', {
       detail: {
         target: this,
-        hour: Number(this._container.innerHTML)
+        hour: Number(this.hour)
       }
     }));
   }
