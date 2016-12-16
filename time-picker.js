@@ -579,7 +579,7 @@ class WebClockLite extends HTMLElement {
       opacity: 0;
       pointer-events: none;
     }
-    .indicator {
+    .hour, .minutes {
       padding: 0 8px;
     }
   </style>
