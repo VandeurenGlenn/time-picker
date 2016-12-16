@@ -4,38 +4,14 @@ import TimePickerPlate from './time-picker-plate';
 export default class TimePickerHourPlate extends TimePickerPlate {
   constructor() {
     super();
+    this._onHourSelect = this._onHourSelect.bind(this);
+    this._onHourIndicating = this._onHourIndicating.bind(this);
+    this._onHourMouseOut = this._onHourMouseOut.bind(this);
   }
 
   connectedCallback() {
     super.connectedCallback();
     this._setupHours();
-  }
-
-  set size(value) {
-    super.size = value;
-    this._size = value;
-    this.style.setPropertyValue('--time-picker-plate-size', `${value}px`);
-  }
-
-	set timeFormat(value) {
-		this._timeFormat = value;
-    this._notifyTimePickerHourElements(value);
-	}
-
-  get size() {
-    return this._size || 200;
-  }
-
-  /**
-   * Returns current time format, options are 'am', 'pm' or 24 hours
-   * @return {String|Number}
-   */
-  get timeFormat() {
-		return this._timeFormat || 'am';
-	}
-
-  get _indicator() {
-    return this.root.querySelector('.indicator');
   }
 
   get hourSet() {
@@ -53,13 +29,6 @@ export default class TimePickerHourPlate extends TimePickerPlate {
       [1, 300, 30],
       [2, 330, 60]
     ];
-  }
-
-  get renderTwentyFourHoursNeeded() {
-    if (this.timeFormat !== 'am' || this.timeFormat !== 'pm') {
-      return true;
-    }
-    return false;
   }
 
   _setupHours() {
@@ -100,18 +69,36 @@ export default class TimePickerHourPlate extends TimePickerPlate {
     }
   }
 
+  _querySelectDigit(number) {
+    let query = `time-picker-hour[digit-value="${number}"]`;
+    return this.root.querySelector(query);
+  }
+
   _onHourIndicating(event) {
     let hour = event.detail.hour;
     let height = 86;
     let top = 80;
+    let digitOverIndicator;
     if (hour > 12) {
-      console.log(hour);
       hour -= 12;
       height -= 36;
       top += 18;
+    } else {
+      // set the current digit the hide
+      digitOverIndicator = hour;
+      digitOverIndicator += 12;
     }
+    this._hideDigitUnderIndicator(digitOverIndicator);
     this._rerenderIndicator(hour, height, top);
     this._indicator.classList.add('show');
+  }
+
+  _hideDigitUnderIndicator(digit) {
+    if (digit) {
+      digit = this._querySelectDigit(digit);
+      digit.style.opacity = 0;
+      this._lastUnderIndicator = digit;
+    }
   }
 
   _rerenderIndicator(_hour, height, top) {
@@ -149,17 +136,14 @@ export default class TimePickerHourPlate extends TimePickerPlate {
 
   _onHourMouseOut() {
     this._indicator.classList.remove('show');
+    if (this._lastUnderIndicator) {
+      this._lastUnderIndicator.style.opacity = 1;
+      this._lastUnderIndicator = undefined;
+    }
   }
 
   _onHourSelect(event) {
     this.dispatchEvent(new CustomEvent('update-hour', {detail: event.detail}));
-  }
-
-  _notifyTimePickerHourElements(timeFormat) {
-    const hourElements = document.querySelectorAll('time-picker-hour');
-    for (let hourElement  of hourElements) {
-      hourElement.timeFormat = timeFormat;
-    }
   }
 }
 customElements.define('time-picker-hour-plate', TimePickerHourPlate);

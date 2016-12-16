@@ -4,6 +4,10 @@ import TimePickerPlate from './time-picker-plate';
 export default class TimePickerMinutesPlate extends TimePickerPlate {
   constructor() {
     super();
+
+    this._onHourSelect = this._onHourSelect.bind(this);
+    this._onHourIndicating = this._onHourIndicating.bind(this);
+    this._onHourMouseOut = this._onHourMouseOut.bind(this);
   }
 
   connectedCallback() {

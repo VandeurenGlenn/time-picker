@@ -56,6 +56,14 @@ export default class TimePickerHour extends HTMLElement {
     this._renderHour = this._renderHour.bind(this);
   }
 
+  set digitValue(value) {
+    if (value) {
+      this.setAttribute('digit-value', value);
+    } else {
+      this.removeAttribute('digit-value');
+    }
+  }
+
   set timeFormat(value) {
     this._timeFormat = value;
     this._renderHour();
@@ -102,6 +110,7 @@ export default class TimePickerHour extends HTMLElement {
       hour += 12;
     }
     this._container.innerHTML = hour;
+    this.digitValue = hour;
   }
 
   _onClick(event) {

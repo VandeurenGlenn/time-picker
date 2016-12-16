@@ -5,6 +5,7 @@ import PubSub from './internals/pub-sub.js';
 import WebClockLite from './../bower_components/web-clock-lite/src/web-clock-lite.js';
 
 let pubsub = new PubSub();
+// TODO: Cleanup & add settings menu
 /**
  * @extends HTMLElement
  */
@@ -28,6 +29,8 @@ class TimePicker extends HTMLElement {
    this._onWebClockClick = this._onWebClockClick.bind(this);
    this._onHourClick = this._onHourClick.bind(this);
    this._onMinutesClick = this._onMinutesClick.bind(this);
+   this._onOk = this._onOk.bind(this);
+   this._onCancel = this._onCancel.bind(this);
   }
 
   /**
@@ -68,6 +71,7 @@ class TimePicker extends HTMLElement {
            opacity: 0;
            margin: 0;
            padding: 0;
+           pointer-events: none;
          }
          time-picker-hour-plate, time-picker-minutes-plate {
            display: none;
@@ -152,6 +156,7 @@ class TimePicker extends HTMLElement {
 					height: 64px;
 					width: 100%;
 					padding: 8px 24px;
+          pointer-events: auto;
         }
         :host(.picker-opened) .am-pm, :host(.picker-opened) .actions {
           opacity: 1;
@@ -166,6 +171,7 @@ class TimePicker extends HTMLElement {
           width: var(--time-picker-plate-size);
           height: var(--time-picker-plate-size);
           padding: var(--time-picker-plate-padding);
+          pointer-events: auto;
         }
        </style>
        <span class="clock-container">
@@ -200,8 +206,11 @@ class TimePicker extends HTMLElement {
   }
 
   get plate() {
-    return this.root.querySelector('time-picker-hour-plate') ||
-      this.root.querySelector('time-picker-minutes-plate');
+    return this.root.querySelector('time-picker-hour-plate');
+  }
+
+  get minutesPlate() {
+    return this.root.querySelector('time-picker-minutes-plate');
   }
 
   get animations() {
@@ -226,6 +235,22 @@ class TimePicker extends HTMLElement {
     return this._time || {hour: '8', minutes: '00'};
   }
 
+  get cancelButton() {
+    return this.root.querySelector('.cancel');
+  }
+
+  get okButton() {
+    return this.root.querySelector('.ok');
+  }
+
+  set opened(value) {
+    this._opened = value;
+  }
+
+  get opened() {
+    return this._opened;
+  }
+
   set hourPicker(value) {
     let plate = this.root.querySelector('time-picker-hour-plate');
     let minutesPlate = this.root.querySelector('time-picker-minutes-plate');
@@ -246,9 +271,20 @@ class TimePicker extends HTMLElement {
     this._time = value;
     this.webClock.hour = value.hour;
     this.webClock.minutes = value.minutes;
+    this.dispatchEvent(new CustomEvent('time-change', {detail: this.time}));
   }
 
   set timeFormat(value) {
+    let amPm = this.root.querySelector('.am-pm');
+    if (value !== 'am' && value !== 'pm') {
+      amPm.style.opacity = 0;
+      amPm.style.height = 0;
+      amPm.style.pointerEvents = 'none';
+    } else {
+      amPm.style.opacity = 1;
+      amPm.style.height = 'initial';
+      amPm.style.pointerEvents = 'auto';
+    }
     this.plate.timeFormat = value;
   }
 
@@ -275,9 +311,8 @@ class TimePicker extends HTMLElement {
   _onUpdateHour(event) {
     let hour = event.detail;
     let time = this.time;
-    if (String(hour).length === 1) {
-      hour = `0${hour}`;
-    }
+    // place a 0 before the digit when length is shorter than 2
+    hour = this._transformToTime(hour);
     time.hour = hour;
     this._notify('time', time);
   }
@@ -285,11 +320,17 @@ class TimePicker extends HTMLElement {
   _onUpdateMinutes(event) {
     let minutes = event.detail;
     let time = this.time;
-    if (String(minutes).length === 1) {
-      minutes = `0${minutes}`;
-    }
+    minutes = this._transformToTime(minutes);
     time.minutes = minutes;
     this._notify('time', time);
+  }
+
+  _transformToTime(number) {
+    // place a 0 before the digit when needed
+    if (String(number).length === 1) {
+      return number = `0${number}`;
+    }
+    return number;
   }
 
   _notify(prop, value) {
@@ -301,7 +342,7 @@ class TimePicker extends HTMLElement {
     if (this.opened) {
       return;
     }
-    this.opened = true;
+    this.opened = !this.opened;
     this.flip(this.opened);
   }
 
@@ -309,15 +350,22 @@ class TimePicker extends HTMLElement {
     let animations;
     // Get the first position.
     var first = this.getBoundingClientRect();
-
+    let hourEl = this.webClock.root.querySelector('.hour');
+    let minutesEl = this.webClock.root.querySelector('.minutes');
     // Get the last position.
     if (opened) {
-      this.webClock.root.querySelector('.hour')
-        .addEventListener('click', this._onHourClick);
-      this.webClock.root.querySelector('.minutes')
-        .addEventListener('click', this._onMinutesClick);
+      hourEl.addEventListener('click', this._onHourClick);
+      minutesEl.addEventListener('click', this._onMinutesClick);
+      this.removeEventListener('click', this._onWebClockClick);
+      this.okButton.addEventListener('click', this._onOk);
+      this.cancelButton.addEventListener('click', this._onCancel);
       this.classList.add('picker-opened');
     } else {
+      hourEl.removeEventListener('click', this._onHourClick);
+      minutesEl.removeEventListener('click', this._onMinutesClick);
+      this.addEventListener('click', this._onWebClockClick);
+      this.okButton.removeEventListener('click', this._onOk);
+      this.cancelButton.removeEventListener('click', this._onCancel);
       this.classList.remove('picker-opened');
     }
     var last = this.getBoundingClientRect();
@@ -355,8 +403,25 @@ class TimePicker extends HTMLElement {
       // Workaround for blurry hours bug.
       requestAnimationFrame(() => {
         this.plate.style.display = 'block';
+        this.minutesPlate.style.display = 'block';
       });
     });
+  }
+
+  _onOk(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.opened = false;
+    this.flip(false);
+    this.dispatchEvent(
+      new CustomEvent('time-picker-select', {detail: this.time}));
+  }
+
+  _onCancel(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.opened = false;
+    this.flip(false);
   }
 }
 customElements.define('time-picker', TimePicker);
