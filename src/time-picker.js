@@ -52,9 +52,6 @@ class TimePicker extends HTMLElement {
            --time-picker-plate-padding: 22px 0 20px 0;
            transition: transform ease-out 160ms, opacity ease-out 160ms, scale ease-out 160ms;
            transform-origin: top left;
-					 position: absolute;
-					 top: 0;
-					 left: 0;
            will-change: transform, height, width, opacity;
            --primary-color: #00bcd4;
            --primary-text-color: #555;
