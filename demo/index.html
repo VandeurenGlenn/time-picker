@@ -33,7 +33,19 @@
     </script>
   </head>
   <body>
-    <time-picker></time-picker>
+    <h1>Picker without clock</h1>
+    <time-picker no-clock="true" hour="16" minutes="30"></time-picker>
+    <button type="button" name="button">OPEN TIMEPICKER</button>
+
+    <h2>Normal picker</h2>
+    <time-picker hour="18" minutes="15"></time-picker>
+    <script>
+      let pickers = document.querySelectorAll('time-picker');
+      let button = document.querySelector('button');
+      button.addEventListener('click', () => {
+        pickers[0].open();
+      });
+    </script>
   </body>
   <!-- Feel free to use a html import instead... -->
   <!-- example: <link rel="import" href="../time-picker.html"> -->
