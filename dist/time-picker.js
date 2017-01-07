@@ -1078,17 +1078,24 @@ class TimePicker extends HTMLElement {
   _onOk(event) {
     event.stopPropagation();
     event.preventDefault();
-    this.opened = false;
-    this.flip(false);
-    this.dispatchEvent(
-      new CustomEvent('time-picker-select', {detail: this.time}));
+    this.close('ok');
   }
 
   _onCancel(event) {
     event.stopPropagation();
     event.preventDefault();
+    this.close('cancel');
+  }
+
+  close(action) {
     this.opened = false;
     this.flip(false);
+    this.dispatchEvent(new CustomEvent('time-picker-action', {
+      detail: {
+        action: action,
+        time: this.time
+      }
+    }));
   }
 
   _toJsProp(string) {
