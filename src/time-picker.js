@@ -97,6 +97,7 @@ class TimePicker extends HTMLElement {
 					 background: var(--clock-container-background);
            color: var(--clock-container-color);
            transition: background ease-in 300ms;
+           pointer-events: auto;
          }
 				 .clock-container {
            box-sizing: border-box;
