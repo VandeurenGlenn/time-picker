@@ -99,6 +99,9 @@ class TimePicker extends HTMLElement {
            transition: background ease-in 300ms;
            pointer-events: auto;
          }
+         :host(.picker-opened) {
+           z-index: 100;
+         }
 				 .clock-container {
            box-sizing: border-box;
 				 }
