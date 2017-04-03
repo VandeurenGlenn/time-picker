@@ -1,6 +1,6 @@
 {
-  "name": "time-picker",
-  "version": "0.1.5",
+  "name": "web-time-picker",
+  "version": "0.1.6",
   "description": "",
   "main": "time-picker.js",
   "scripts": {
@@ -37,5 +37,8 @@
     "plugins": [
       "external-helpers"
     ]
+  },
+  "dependencies": {
+    "web-clock-lite": "^0.0.1"
   }
 }

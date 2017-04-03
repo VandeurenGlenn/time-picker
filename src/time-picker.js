@@ -2,7 +2,7 @@
 import TimePickerHourPlate from './time-picker-hour-plate.js';
 import TimePickerMinutesPlate from './time-picker-minutes-plate.js';
 import PubSub from './internals/pub-sub.js';
-import WebClockLite from './../bower_components/web-clock-lite/src/web-clock-lite.js';
+import WebClockLite from 'web-clock-lite';
 
 let pubsub = new PubSub();
 // TODO: Cleanup & add settings menu
