@@ -20,7 +20,8 @@ task('rollup', () => {
     cache = bundle;
     bundle.write({
       dest: 'dist/time-picker.js',
-      format: 'cjs',
+      format: 'iife',
+      moduleName: 'timePicker',
       plugins: [ babel() ]
     });
   });

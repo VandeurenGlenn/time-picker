@@ -1,6 +1,5 @@
+(function (webClockLite) {
 'use strict';
-
-var webClockLite = require('web-clock-lite');
 
 class TimePickerHour extends HTMLElement {
   constructor() {
@@ -1043,3 +1042,5 @@ class TimePicker extends HTMLElement {
   }
 }
 customElements.define('time-picker', TimePicker);
+
+}(webClockLite));
